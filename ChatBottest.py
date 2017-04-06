@@ -6,7 +6,7 @@ import random
 
 ChatLog = open('ChatLog', 'w')
 
-keywords = [['moodle', 'login', 'email', 'modules', 'module', 'missing', 'extra', 'coursework', 'timetable', 'down'],
+keywords = [['moodle', 'login', 'email', 'modules', 'missing', 'extra', 'coursework', 'timetable', 'down'],
             ['software', 'university', 'uni', 'home', 'missing', 'files', 'save', 'crash'],
             ['hardware', 'printer', 'credits', 'periferals', 'mouse', 'keyboard']]
 
@@ -19,7 +19,7 @@ def Error():
 def InputPhrase():
     global Phrase
     Phrase = word_tokenize(input('User: ').lower())
-    cp = nltk.RegexpParser("""NT: {<RB><IN><NN>?<NNS>?}
+    cp = nltk.RegexpParser("""NT: {<RB><IN><NN>}
                            NP: {<DT>?<JJ>*<NN>}
                            VB: {<VBP>?<VB>*<VBG>}""")
     result = cp.parse(nltk.pos_tag(Phrase))
@@ -34,20 +34,18 @@ def InputPhrase():
                 print (result[x])
                 for i in result[x]:
                     if "hardware" in i or "moodle" in i or "software" in i:
-                        print ("Okay, what area is the issue occuring from?")
+                        print ("Okay, what are is the issue occuring from?")
                         Problem()
             x+=1
     except AttributeError:
         print("")
-
+    
     #print (result[1])
     #result.draw()
-
-
+        
+            
 def Support():
-    print("Here is the contact information for technical support.\n")
-    print("Email:  advice.its@coventry.ac.uk\n")
-    print("Phone: 02476 88 7777")
+    print("Here is the contact information for technical support.")
     ChatLog.write("Passed onto support staff.")
     ChatLog.close()
     sys.exit()
@@ -62,24 +60,23 @@ def Complete():
         if i.lower() == "yes":
             x = 1
             print("What is the area of the next problem?")
-            Problem()
+            problem()
     if x == 0:
         ChatLog.close()
         sys.exit()
 def Problem():
     InputPhrase()
-    global Phrase
     x=0
     for i in Phrase:
-        if any(x in keywords[2] for x in Phrase):
+        if i.lower() == keywords[2][0]:
             x = 1
             ChatLog.write("Problem Area: Hardware\n")
             HwArea()
-        elif any(x in keywords[1] for x in Phrase):
+        elif i.lower() == keywords[1][0]:
             x = 1
             ChatLog.write("Problem Area: Software\n")
             SwArea()
-        elif any(x in keywords[0] for x in Phrase):
+        elif i.lower() == keywords[0][0]:
             x = 1
             ChatLog.write("Problem Area: Moodle\n")
             MdlArea()
@@ -93,7 +90,9 @@ def loop():
     print("Is there anything else I can try to help with?")
     Problem()
 def MdlArea():
-    z=0
+
+    print("what area of the moodle system are causeing these problems?")
+    InputPhrase()
     if any(x in keywords[0] for x in Phrase):
         for i in Phrase:
             if i.lower() == "email" or i.lower() == "e-mail":
@@ -101,7 +100,6 @@ def MdlArea():
                 InputPhrase()
                 for i in  Phrase:
                     if i.lower() == "yes":
-                        z=1
                         ChatLog.write("Issue with 'the email system\n")
                         ChatLog.write(" ".join(Phrase))
                         print("There is not much I can help with, all I can do is remind you of the address format: uni.coventry.ac.uk and that the password has a uppercase and a symbol.")
@@ -110,13 +108,12 @@ def MdlArea():
                     elif i.lower == "no":
                         Sorry()
                         MdlArea()
-
+                    
             elif i.lower() == "login" or i.lower() == "logging":
-                print("You are having issues logging into Moodle?")
+                print("You are having issues loggin into Moodle?")
                 InputPhrase()
                 for i in Phrase:
                     if i.lower() =="yes":
-                        z=1
                         ChatLog.write("Issue with the moodle login\n'")
                         print("There is not much I can help with, all I can do is remind you of the login format: name+initial+number and that the password has a uppercase and a symbol.")
                         Support()
@@ -124,12 +121,11 @@ def MdlArea():
                     elif i.lower()== "no":
                         Sorry()
                         MdlArea()
-            elif i.lower() == "modules" or i.lower() == "module":
+            elif i.lower() == "modules":
                 print("You are having issues with you module pages, correct?")
                 InputPhrase()
                 for i in Phrase:
                     if i.lower() =="yes":
-                        z=1
                         ChatLog.write("Issue with the modules page\n'")
                         ChatLog.write(" ".join(Phrase))
                         MdlModule()
@@ -141,20 +137,14 @@ def MdlArea():
                 InputPhrase()
                 for i in Phrase:
                     if i.lower() =="yes":
-                        z=1
                         print("Issues with Timetables can be fixed by messaging Regisrty.")
                         sys.exit()
                     elif i.lower()== "no":
                         Sorry()
             elif i.lower() == "down":
                 print("Unforntunatly Moodle is hosted externaly from the university, and we have no control over the servers. They will be up again as soons as they can be.")
-
-    else:
+    else: 
         Error()
-        MdlArea()
-    if z ==0:
-        print("what area of the moodle system are causeing these problems?")
-        InputPhrase()
         MdlArea()
 def MdlModule():
     print("What part of Modules are not working.")
@@ -180,22 +170,19 @@ def MdlModule():
         Error()
         MdlModule()
 def SwArea():
+    print("Are the software issues based around university software or software at home?")
+    InputPhrase()
     x=0
-    if any(x in keywords[1] for x in Phrase):
-        for i in Phrase:
-            if i.lower() == "university" or i.lower() == "uni":
-                x = 1
-                SwUni()
+    for i in Phrase:
+        if i.lower() == "university" or i.lower() == "uni":
+            x = 1
+            SwUni()
 
-            elif i.lower()== "home":
-                x = 1
-                SwHome()
-    else:
-        Error()
-        SwArea
+        elif i.lower()== "home":
+            x = 1
+            SwHome()
     if x == 0:
-        print("Are the software issues based around university software or software at home?")
-        InputPhrase()
+        Error()
         SwArea()
 def SwUni():
     print("Are you having issues with not being able to find software or is it an issue with the software itself?")
@@ -214,7 +201,7 @@ def SwUni():
         SwUni()
 def SwHome():
     print("I will try to help as best as I can but many pieces of software I will not be able to help in detail.")
-    print("Most fixes will be general to most pieces of software.")
+    print("Most fixes will be general to most piseces of software.")
     InputPhrase()
     x = 0
     for i in Phrase:
@@ -224,14 +211,10 @@ def SwHome():
             time.sleep(1)
             print("If this did not work try uninstalling the software and then re-installing it afresh.")
             Complete()
-        elif i.lower() =="files":
-            print("All I can suggest is that you make sure that they have not been saved in a different location from normal, and that the software may have saved a temporary files if you check the previous files list.")
-            Complete()
         #####finish#####
-    if x ==0:
-        Error()
-        SwHome()
 def HwArea():
+    print("what area of the hardware are causeing these problems?")
+    InputPhrase()
     if any(x in keywords[2] for x in Phrase):
         for i in Phrase:
             if i.lower() == "printer" or i.lower() == "printers":
@@ -255,8 +238,6 @@ def HwArea():
                 Complete()
         #####finish#####
     else:
-        print("what area of the hardware are causeing these problems?")
-        InputPhrase()
         Error()
         HwArea()
 def Files():
@@ -280,7 +261,7 @@ def Files():
             print("To access your university files from home you can use remote desktop connection. Which should be installed on your home maciene as standard.")
             time.sleep(1)
             print("Use cu2study.coventry.ac.uk AS the computer to connect to, you will then be asked to login with you university login details to access your files.")
-            time.sleep(1)
+            time.sleep()
             Complete()
 
     if x == 0:
